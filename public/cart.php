@@ -23,6 +23,8 @@ if(isset($_GET['remove'])) {
   $_SESSION['product_' . $_GET['remove']]--;
 
   if($_SESSION['product_' . $_GET['remove']] < 1) {
+    unset($_SESSION['item_total']);
+    unset($_SESSION['item_quantity']);
     redirect("checkout.php");
   } else {
     redirect("checkout.php");
@@ -31,10 +33,15 @@ if(isset($_GET['remove'])) {
 
 if(isset($_GET['delete'])) { 
   $_SESSION['product_' . $_GET['delete']]= '0'; 
+  unset($_SESSION['item_total']);
+  unset($_SESSION['item_quantity']);
   redirect("checkout.php");
 }
 
 function cart() {
+
+  $total = 0;
+  $item_quantity =0;
 
   foreach ($_SESSION as $name => $value) {
 
@@ -49,17 +56,25 @@ function cart() {
         confirm($query);
     
 while($row = fetch_array($query)){
+
+$sub= $row['product_price']*$value;
+$item_quantity +=$value; 
+
 $product = <<<DELIMETER
 <tr>
 <td>{$row['product_title']}</td>
-<td>$23</td>
-<td>3</td>
-<td>2</td>
+<td>&#36;{$row['product_price']}</td>
+<td>{$value}</td>
+<td>&#36;{$sub}</td>
 <td><a class='btn btn-warning' href="cart.php?remove={$row['product_id']}"><span class='glyphicon glyphicon-minus'></span></a>         <a class='btn btn-success' href="cart.php?add={$row['product_id']}"><span class='glyphicon glyphicon-plus'></span></a>          <a class='btn btn-danger' href="cart.php?delete={$row['product_id']}"><span class='glyphicon glyphicon-remove'></span></a></td>
 </tr>
 DELIMETER;
 echo $product;  
+
 }
+
+$_SESSION['item_total'] = $total += $sub;
+$_SESSION['item_quantity'] = $item_quantity;
     
         }
       
